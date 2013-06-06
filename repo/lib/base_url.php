@@ -1,4 +1,4 @@
 <?php
-$base_url = 'http://localhost/';
+$base_url = 'http://localhost/repo/';
 
 ?>

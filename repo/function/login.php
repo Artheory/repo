@@ -1,20 +1,30 @@
 <?php
-
+session_start();
 require('../lib/base_url.php');
-
-function json_decode_nice($json, $assoc = FALSE){ 
-    $json = str_replace(array("\n","\r"),"",$json); 
-    $json = preg_replace('/([{,]+)(\s*)([^"]+?)\s*:/','$1"$3":',$json); 
-    return json_decode($json,$assoc); 
-}
 
 $username=$_POST['username'];
 $password=$_POST['password'];
-$alamat = $base_url.'repo/api/login?username='.$username.'&password='.$password;
-$handle = fopen("$alamat", "rb");
-$contents = stream_get_contents($handle);
-fclose($handle);
 
-$data = var_dump(json_decode($contents, true));
+if ((!$username) and (!$password)) // cek apakah ada inputan kosong
+	{
+	header("location:index.php"); // ya, input kosong
+    exit;
+	}else{
 
+	$alamat = $base_url.'api/login?username='.$username.'&password='.$password;
+	$handle = fopen("$alamat", "rb");
+	$contents = stream_get_contents($handle);
+	fclose($handle);
+
+	$data = json_decode($contents, true);
+	
+	if ($data['status'] != "failed"){
+		$_SESSION[username]=$data['username'];
+	}else{
+		session_unregister("username");
+	}
+	
+	header( 'Location: '.$base_url ) ;
+	//print_r($data);
+}
 ?>

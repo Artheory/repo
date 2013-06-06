@@ -43,21 +43,45 @@
 			$password=$_GET['password'];
 			
 			if(!empty($username) and !empty($password)){
-				//$sql = mysql_query("SELECT id, username, email FROM user WHERE username = '$username' AND password = '".md5($password)."' LIMIT 1", $this->db);
-				$sql = mysql_query("SELECT id, username, studentMail FROM user WHERE username = '$username' AND password = '$password' LIMIT 1", $this->db);
+				$sql = mysql_query("SELECT id, username, studentMail FROM user WHERE username = '$username' AND password = '".md5($password)."' LIMIT 1", $this->db);
 				if(mysql_num_rows($sql) > 0){
 					$result = mysql_fetch_array($sql,MYSQL_ASSOC);
 					
 					// If success everythig is good send header as "OK" and user details
 					$this->response($this->json($result), 200);
+				}else{
+					$error = array('status' => "failed", "msg" => "Invalid Username or Password");
+					$this->response($this->json($error), 200);
 				}
 				$this->response('', 204);	// If no records "No Content" status
 			}
 			
 			// If invalid inputs "Bad Request" status message and reason
-			$error = array('status' => "Failed", "msg" => "Invalid Email address or Password");
+			$error = array('status' => "failed", "msg" => "Invalid Email address or Password");
 			$this->response($this->json($error), 400);
         }
+		
+		public function register(){
+			if($this->get_request_method() != "GET"){
+				$this->response('',406);
+			}
+			$student	= $_GET['student'];
+            $username	= $_GET['username'];
+			$password	= $_GET['password'];
+			$phone		= $_GET['phone'];
+			$email		= $_GET['email'];
+			if(!empty($student) and !empty($username) and !empty($password) and !empty($phone) and !empty($email)){
+                mysql_query(("INSERT INTO m001_user (id,username,password,studentMail,phone,email)
+                                    VALUES ('','$username','$password','$student', '$phone','$email')"),$this->db);
+				//benerin query nya. required html page. field harus dimasukin semua walaupun kosong
+
+                    // If success everythig is good send header as "OK" and m001_user details
+					$data = array('blablabla' => "data yang diinsert masukin disini");
+                   
+					$status = array('status' => "success", "msg" => "Register Success", "data" => $data);
+					$this->response($this->json($status), 200);
+            }
+		}
 
 		private function json($data){
 			if(is_array($data)){
